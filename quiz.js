@@ -2,7 +2,7 @@
    Each quiz page sets window.QUIZ before loading this file:
    { key, todayId, title, lead, art, letters, days: [[question numbers], ...], qs: [{sec, q, c: [choices], a, hint, sol}] }
    Change STUDENT_NAME to show a name in the praise messages ("" = no name). */
-const STUDENT_NAME = "Jisun";
+const STUDENT_NAME = "Vincent";
 
 (function () {
   const Q = window.QUIZ;
