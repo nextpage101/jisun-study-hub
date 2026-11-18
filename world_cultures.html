@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Social Studies: World Cultures</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+:root { --bg: #EAF7EF; --line: #C4E4D1; --accent: #2D7D5A; --soft: #DDF1E5; }
+</style>
+</head>
+<body>
+<div class="wrap" id="main"></div>
+<script>
+const GLOBE = `<svg viewBox="0 0 200 200" role="img" aria-label="Globe with latitude and longitude lines">
+  <circle cx="100" cy="100" r="92" fill="#DDF1E5"/>
+  <circle cx="100" cy="100" r="54" fill="#FFFFFF" stroke="#2D7D5A" stroke-width="4"/>
+  <g fill="none" stroke="#2D7D5A" stroke-width="2.5" opacity=".75">
+    <ellipse cx="100" cy="100" rx="22" ry="54"/><path d="M100 46 v108 M46 100 h108 M54 72 h92 M54 128 h92"/></g>
+  <path d="M100 100 m-54 0 a54 54 0 0 0 108 0" fill="#8FD6C4" opacity=".25"/>
+  <path d="M132 58 c-12 0 -20 9 -20 19 c0 14 20 32 20 32 s20 -18 20 -32 c0 -10 -8 -19 -20 -19z" fill="#FFD36E" stroke="#2D7D5A" stroke-width="3.5" stroke-linejoin="round"/>
+  <circle cx="132" cy="77" r="6" fill="#FFFFFF" stroke="#2D7D5A" stroke-width="2.5"/>
+</svg>`;
+
+// TEKS Grade 6 Social Studies — Contemporary World Cultures (practice questions)
+// [unit, question, correct answer, wrong 1, wrong 2, wrong 3, hint, explanation]
+const UNITS = {1: "Geography", 2: "Culture", 3: "Government & Citizenship", 4: "Economics", 5: "World Regions"};
+const RAW = [
+  // 1. Geography
+  [1, "Lines of latitude measure distance north or south of which line?", "The Equator", "The Prime Meridian", "The International Date Line", "The Tropic of Cancer",
+   "Latitude lines run east–west, like the rungs of a ladder. Where is 0° latitude?", "Latitude is measured in degrees north or south of the Equator (0°)."],
+  [1, "The Prime Meridian (0° longitude) passes through which city?", "Greenwich, England", "Paris, France", "New York City, USA", "Cairo, Egypt",
+   "It was set at a famous royal observatory in the United Kingdom.", "The Prime Meridian runs through the Royal Observatory in Greenwich, near London."],
+  [1, "Which is the largest ocean on Earth?", "Pacific Ocean", "Atlantic Ocean", "Indian Ocean", "Arctic Ocean",
+   "It lies between Asia/Australia and the Americas.", "The Pacific Ocean is the largest and deepest ocean, covering about one-third of Earth’s surface."],
+  [1, "On which type of world map does Greenland look much larger than it really is?", "Mercator projection", "Robinson projection", "A globe", "An equal-area projection",
+   "This map is great for sailors because directions stay true, but land near the poles gets stretched.", "The Mercator projection keeps directions accurate but greatly enlarges areas far from the Equator, like Greenland."],
+  [1, "Which landform is surrounded by water on <b>three</b> sides?", "Peninsula", "Island", "Plateau", "Delta",
+   "Think of Florida or Italy.", "A peninsula is land surrounded by water on three sides, like Florida. An island is surrounded on all sides."],
+  [1, "Which climate is hot and wet all year and is found near the Equator?", "Tropical rainforest (tropical wet)", "Tundra", "Mediterranean", "Desert",
+   "Places near the Equator get direct sunlight all year.", "Tropical rainforest climates near the Equator are hot with heavy rainfall all year, like the Amazon Basin."],
+  [1, "The “Ring of Fire” around the Pacific Ocean is known for:", "Frequent earthquakes and volcanoes", "Frequent hurricanes", "Large deserts", "Thick glaciers",
+   "Many tectonic plates meet around the edge of the Pacific.", "The Ring of Fire is where tectonic plates meet, causing many earthquakes and volcanoes."],
+  [1, "The Sahara, the largest hot desert in the world, is on which continent?", "Africa", "Asia", "Australia", "South America",
+   "It stretches across the northern part of this continent.", "The Sahara covers much of North Africa."],
+  [1, "“Push” and “pull” factors are used to explain:", "Why people migrate", "How mountains form", "How rivers flood", "Why seasons change",
+   "A push factor makes people leave a place; a pull factor attracts them to a new place.", "Push factors (like war or lack of jobs) and pull factors (like jobs or freedom) explain migration."],
+  [1, "Which map would best show the elevation (height) of the land?", "A physical (relief) map", "A political map", "A population map", "A road map",
+   "Which map shows mountains, valleys, and plains with colors or shading?", "Physical or relief maps use colors and shading to show elevation and landforms."],
+  // 2. Culture
+  [2, "What is cultural diffusion?", "The spread of cultural traits from one group to another", "A group keeping its culture exactly the same", "The study of ancient ruins", "Moving from a city to a farm",
+   "“Diffuse” means to spread out.", "Cultural diffusion is the spread of ideas, foods, languages, and customs between cultures, such as pizza spreading worldwide."],
+  [2, "Which of these world religions began in India?", "Hinduism", "Islam", "Judaism", "Christianity",
+   "This religion is one of the oldest in the world and is practiced by most people in India today.", "Hinduism began in South Asia (India). Islam began in Arabia; Judaism and Christianity began in Southwest Asia."],
+  [2, "The religion of Islam began in which region?", "The Arabian Peninsula", "East Asia", "Western Europe", "South America",
+   "The holy city of Mecca is in this region.", "Islam began in the 600s CE in Mecca and Medina on the Arabian Peninsula."],
+  [2, "Which language has the most <b>native</b> speakers in the world?", "Mandarin Chinese", "English", "Spanish", "Arabic",
+   "Think about the country with one of the largest populations.", "Mandarin Chinese has the most native speakers. English has many speakers, but many learn it as a second language."],
+  [2, "An ethnic group is a group of people who share:", "Common ancestry, language, and customs", "The same job", "The same favorite sport", "The same street address",
+   "Think about heritage and traditions passed down in families.", "An ethnic group shares a common heritage such as ancestry, language, religion, or customs."],
+  [2, "Urbanization means:", "People moving from rural areas into cities", "People moving from cities to farms", "Building more farms", "Cutting down forests",
+   "“Urban” means related to a city.", "Urbanization is the growth of cities as people move from the countryside to urban areas."],
+  [2, "Population density is:", "The number of people living in a given area, such as per square mile", "The total number of people in a country", "How fast a population grows", "The average age of people",
+   "“Density” compares an amount to a space.", "Population density = number of people ÷ land area. Bangladesh has high density; Canada has low density."],
+  [2, "Which of the following is an example of a <b>cultural</b> trait?", "The language a family speaks", "The amount of rainfall", "The height of a mountain", "A country’s latitude",
+   "Culture is something people create and learn, not something nature makes.", "Culture includes language, religion, food, clothing, and customs. Rainfall and mountains are physical features."],
+  [2, "Judging another culture only by the standards of your own culture is called:", "Ethnocentrism", "Cultural diffusion", "Urbanization", "Migration",
+   "“Ethno” = people/culture, “centric” = at the center.", "Ethnocentrism is viewing your own culture as the center or the “best,” and judging others by it."],
+  [2, "Which invention from around 1450 helped ideas spread quickly across Europe?", "The printing press", "The telephone", "The steam engine", "The radio",
+   "Johannes Gutenberg is linked to this invention.", "Gutenberg’s printing press made books cheaper and faster to produce, spreading ideas widely."],
+  // 3. Government & Citizenship
+  [3, "In a direct democracy:", "Citizens vote on laws themselves", "A king makes all decisions", "Citizens elect representatives to make laws", "Religious leaders make the laws",
+   "“Direct” means no one in the middle.", "In a direct democracy, citizens vote on laws directly, as in ancient Athens."],
+  [3, "The United States is best described as a:", "Representative democracy (constitutional republic)", "Absolute monarchy", "Direct democracy", "Theocracy",
+   "Americans elect members of Congress to make laws for them.", "The U.S. is a constitutional republic: citizens elect representatives, and a constitution limits government power."],
+  [3, "In an absolute monarchy, the ruler:", "Has unlimited power, usually inherited", "Is elected every four years", "Shares power with a parliament", "Is chosen by a vote of all citizens",
+   "“Absolute” means total or complete.", "An absolute monarch holds total power, usually passed down through a royal family."],
+  [3, "Which country is an example of a <b>constitutional monarchy</b>?", "United Kingdom", "North Korea", "United States", "Ancient Athens",
+   "This country has a king, but an elected parliament makes the laws.", "The United Kingdom has a monarch with limited, mostly ceremonial power; Parliament governs under constitutional rules."],
+  [3, "A government in which one leader or one party controls almost every part of people’s lives is called:", "Totalitarian (a dictatorship)", "Representative democracy", "Limited government", "Direct democracy",
+   "“Total” control.", "In a totalitarian government, one leader or party controls the economy, media, and daily life, with few rights for citizens."],
+  [3, "Limited government means that:", "The government’s power is restricted by laws or a constitution", "The government has no laws", "Only a few people may vote", "The ruler can do anything",
+   "Think about rules that even the leaders must follow.", "Limited government means leaders must follow the law, and citizens have rights the government cannot take away."],
+  [3, "A theocracy is a government:", "Led by religious leaders or based on religious law", "Led by elected representatives", "With no leader at all", "Run by business owners",
+   "“Theo” comes from the Greek word for god.", "In a theocracy, religious leaders rule or laws are based on religion. Vatican City and Iran are examples."],
+  [3, "Which is a responsibility of a citizen in a democracy?", "Voting and serving on a jury", "Choosing the next king", "Printing money", "Writing laws alone",
+   "Citizens help government work by taking part.", "Responsibilities of citizens include voting, obeying laws, paying taxes, and serving on juries."],
+  [3, "The United Nations was founded in 1945 mainly to:", "Promote world peace and cooperation", "Form one world government", "Control all world trade", "Run the Olympic Games",
+   "It was created right after World War II.", "The UN was founded after World War II to keep peace, protect human rights, and help nations cooperate."],
+  [3, "The Universal Declaration of Human Rights (1948) was adopted by:", "The United Nations", "The U.S. Congress", "The British Parliament", "The European Union",
+   "It was created by the international organization founded in 1945.", "The UN General Assembly adopted the Universal Declaration of Human Rights in 1948."],
+  // 4. Economics
+  [4, "In a traditional economy, economic decisions are mostly based on:", "Customs and habits passed down over generations", "Government plans", "Supply and demand in markets", "Stock market prices",
+   "“Traditional” — doing things the way they’ve always been done.", "Traditional economies rely on customs, often farming, hunting, or herding as earlier generations did."],
+  [4, "In a command economy:", "The government decides what to produce and the prices", "Individuals decide everything", "Customs decide everything", "There is no money",
+   "Who gives the “commands”?", "In a command economy, the government controls production and prices. North Korea is an example."],
+  [4, "In a free enterprise (market) system, what mainly determines prices?", "Supply and demand", "The government", "Religious leaders", "Tradition",
+   "Think about buyers and sellers.", "In a market economy, prices are set by the interaction of supply (sellers) and demand (buyers)."],
+  [4, "Most countries today, including the United States, have which type of economy?", "Mixed economy", "Pure command economy", "Pure traditional economy", "No economy",
+   "The U.S. has free markets but also government rules and services.", "A mixed economy combines free markets with some government involvement, like safety rules and public schools."],
+  [4, "According to the law of demand, when the price of a product goes up:", "People usually buy less of it", "People usually buy more of it", "Nothing changes", "The product disappears",
+   "Imagine your favorite snack doubling in price.", "As price rises, quantity demanded usually falls; as price falls, people tend to buy more."],
+  [4, "Gross Domestic Product (GDP) is:", "The total value of goods and services produced in a country in a year", "The number of people in a country", "The amount of money a government owes", "The number of exports only",
+   "It measures the size of a country’s economy.", "GDP is the market value of all final goods and services produced within a country in one year."],
+  [4, "GDP per capita is found by:", "Dividing GDP by the population", "Multiplying GDP by the population", "Adding imports and exports", "Counting the number of businesses",
+   "“Per capita” means “per person.”", "GDP per capita = GDP ÷ population. It helps compare standards of living between countries."],
+  [4, "Compared with developing countries, developed countries usually have:", "Higher literacy rates and longer life expectancy", "More people working in farming", "Lower GDP per capita", "Fewer schools and hospitals",
+   "Think about education, health, and income.", "Developed countries tend to have high GDP per capita, high literacy, long life expectancy, and strong infrastructure."],
+  [4, "A product that a country buys from another country is called:", "An import", "An export", "A tariff", "A quota",
+   "“Im-” means into.", "Imports come into a country; exports are sold out to other countries."],
+  [4, "Opportunity cost is:", "The value of the next-best choice you give up", "The price printed on a tag", "Money saved in a bank", "The total cost of all choices",
+   "If you spend Saturday at the movies, what else could you have done?", "Opportunity cost is what you give up when you choose one option — the next-best alternative."],
+  // 5. World Regions
+  [5, "Which mountain range is traditionally considered the boundary between Europe and Asia?", "Ural Mountains", "Alps", "Andes", "Rocky Mountains",
+   "These mountains run north–south through Russia.", "The Ural Mountains in Russia are the traditional dividing line between Europe and Asia."],
+  [5, "Most of the Amazon Rainforest is located in which country?", "Brazil", "Mexico", "Argentina", "Chile",
+   "It’s the largest country in South America.", "About 60% of the Amazon Rainforest is in Brazil."],
+  [5, "Mount Everest, the world’s highest mountain, is in which mountain range?", "Himalayas", "Alps", "Andes", "Appalachians",
+   "This range is in South Asia, along the border of Nepal and China.", "Mount Everest is in the Himalayas on the border of Nepal and China (Tibet)."],
+  [5, "Which region holds a large share of the world’s known oil reserves?", "Southwest Asia (around the Persian Gulf)", "Antarctica", "Western Europe", "Central America",
+   "Saudi Arabia, Iraq, and Kuwait are in this region.", "Countries around the Persian Gulf, such as Saudi Arabia, Iran, Iraq, and Kuwait, hold huge oil reserves."],
+  [5, "Apartheid was a system of racial segregation in which country?", "South Africa", "Canada", "Japan", "Brazil",
+   "Nelson Mandela helped end it and became that country’s president in 1994.", "Apartheid was legal racial segregation in South Africa until the early 1990s."],
+  [5, "The European Union (EU) allows member countries to:", "Trade freely with one another, and many share the euro", "Ignore each other’s borders in wartime", "Elect one king for all of Europe", "Use only one language",
+   "It is an economic and political partnership.", "The EU is a union of European countries with free trade and movement; many members use the euro as currency."],
+  [5, "Japan is best described as:", "An archipelago (a chain of islands)", "A landlocked country", "A desert country", "A peninsula attached to China",
+   "It is made up of four main islands and thousands of smaller ones.", "Japan is an archipelago in the Pacific Ocean with four main islands: Honshu, Hokkaido, Kyushu, and Shikoku."],
+  [5, "Which is both a country <b>and</b> a continent?", "Australia", "Greenland", "India", "Brazil",
+   "It is in the Southern Hemisphere and is home to kangaroos.", "Australia is the only nation that covers an entire continent."],
+  [5, "As of 2023, which country has the largest population in the world?", "India", "China", "United States", "Indonesia",
+   "This country passed China in 2023, according to United Nations estimates.", "According to the UN, India passed China in 2023 to become the most populous country."],
+  [5, "The Panama Canal connects which two bodies of water?", "The Atlantic and Pacific Oceans", "The Mediterranean and Red Seas", "The Indian and Arctic Oceans", "Lake Michigan and Lake Huron",
+   "Panama is in Central America, between two oceans.", "The Panama Canal lets ships travel between the Atlantic and Pacific Oceans without sailing around South America."]
+];
+
+// Spread the correct answer evenly over A–D
+const QS = RAW.map(([u, q, right, w1, w2, w3, hint, sol], i) => {
+  const a = (i * 3 + 1) % 4, wrong = [w1, w2, w3], c = [];
+  for (let k = 0, w = 0; k < 4; k++) c.push(k === a ? right : wrong[w++]);
+  return {sec: UNITS[u], q, c, a, hint, sol};
+});
+
+window.QUIZ = {
+  key: "world-cultures-quiz-days-v1",
+  todayId: "ss",
+  title: "Time for Social Studies",
+  lead: "TEKS Grade 6 · Contemporary World Cultures. Ten questions a day!",
+  art: GLOBE,
+  letters: ["A", "B", "C", "D"],
+  // 10 questions a day: 2 from each unit, so every day mixes all five units
+  days: [0, 1, 2, 3, 4].map(d => { const a = [1, 2, 3, 4, 5].map(u => (u - 1) * 10 + d * 2 + 1); return [...a, ...a.map(n => n + 1)]; }),
+  qs: QS
+};
+</script>
+<script src="quiz.js"></script>
+</body>
+</html>

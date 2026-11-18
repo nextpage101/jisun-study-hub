@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AMC 8 Challenge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+:root { --bg: #EEF0FF; --line: #D3D6F5; --accent: #4B4FC4; --soft: #E6E7FB; }
+</style>
+</head>
+<body>
+<div class="wrap" id="main"></div>
+<script>
+const ART = `<svg viewBox="0 0 200 200" role="img" aria-label="Triangle inscribed in a circle">
+  <circle cx="100" cy="100" r="92" fill="#E6E7FB"/>
+  <circle cx="100" cy="100" r="54" fill="#FFFFFF" stroke="#4B4FC4" stroke-width="4"/>
+  <path d="M100 46 L146.8 127 L53.2 127 Z" fill="#C9CBF5" stroke="#4B4FC4" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M100 100 L100 46 M100 100 L146.8 127" stroke="#4B4FC4" stroke-width="2" stroke-dasharray="4 5" stroke-linecap="round"/>
+  <path d="M60 40 a70 70 0 0 1 80 0" fill="none" stroke="#FFD36E" stroke-width="4" stroke-linecap="round"/>
+  <g fill="#FFD36E" stroke="#4B4FC4" stroke-width="2.5"><circle cx="100" cy="46" r="6"/><circle cx="146.8" cy="127" r="6"/><circle cx="53.2" cy="127" r="6"/></g>
+  <circle cx="100" cy="100" r="4" fill="#4B4FC4"/>
+</svg>`;
+
+const SQUARE_FIG = `<svg viewBox="0 0 160 160" role="img" aria-label="Square ABCD with M the midpoint of BC and N the midpoint of CD; triangle AMN shaded">
+  <rect x="20" y="20" width="120" height="120" fill="#FFFFFF" stroke="#4B4FC4" stroke-width="3"/>
+  <path d="M20 140 L140 80 L80 20 Z" fill="#C9CBF5" stroke="#4B4FC4" stroke-width="3" stroke-linejoin="round"/>
+  <g font-family="Nunito, Arial" font-size="13" font-weight="700" fill="#1F2A3A">
+    <text x="6" y="154">A</text><text x="144" y="154">B</text><text x="144" y="16">C</text><text x="6" y="16">D</text>
+    <text x="146" y="84">M</text><text x="76" y="14">N</text></g>
+</svg>`;
+
+// [section, question (HTML), [A, B, C, D, E], answer index, hint, solution]
+// Original practice problems written in the style of AMC 8 (not copied from real contests).
+const RAW = [
+  ["Number Theory", "How many positive integers less than 100 have <b>exactly 3</b> positive divisors?", ["3", "4", "5", "6", "9"], 1,
+   "A number with exactly 3 divisors must be the square of a prime. Why?", "Only p² (p prime) has exactly 3 divisors: 1, p, p². Under 100: 4, 9, 25, 49 → 4 numbers."],
+  ["Algebra", "The sum of five consecutive odd integers is 135. What is the <b>largest</b> of the five?", ["31", "33", "35", "37", "39"], 0,
+   "For consecutive odd numbers, the middle one is the average.", "The middle number is 135 ÷ 5 = 27. The five numbers are 23, 25, 27, 29, 31, so the largest is 31."],
+  ["Geometry", "A rectangle has perimeter 34 and a diagonal of length 13. What is its area?", ["30", "40", "56", "60", "72"], 3,
+   "Let the sides be l and w. You know l + w and l² + w². Try squaring (l + w).", "l + w = 17 and l² + w² = 169. Then (l + w)² = 289 = 169 + 2lw, so 2lw = 120 and lw = 60. (The sides are 12 and 5.)"],
+  ["Number Theory", "What is the units digit of 7<sup>2026</sup>?", ["1", "3", "5", "7", "9"], 4,
+   "Write out the units digits of 7¹, 7², 7³, 7⁴, 7⁵… Do you see a cycle?", "Units digits repeat 7, 9, 3, 1 (cycle of 4). 2026 = 4 × 506 + 2, so the units digit matches 7², which is 9."],
+  ["Counting & Probability", "How many different arrangements of the letters in the word <b>LEVEL</b> are there?", ["20", "24", "30", "60", "120"], 2,
+   "Start with 5! and then fix the overcounting from repeated letters.", "There are 5 letters with L twice and E twice: 5! ÷ (2! × 2!) = 120 ÷ 4 = 30."],
+  ["Algebra", "The average of six numbers is 15. When one number is removed, the average of the remaining five numbers is 13. What number was removed?", ["13", "17", "20", "25", "28"], 3,
+   "Turn each average into a total sum.", "The six numbers add up to 6 × 15 = 90. The five remaining add up to 5 × 13 = 65. The removed number is 90 − 65 = 25."],
+  ["Geometry", "What is the smaller angle between the hour hand and the minute hand of a clock at <b>3:40</b>?", ["130°", "135°", "140°", "145°", "150°"], 0,
+   "The hour hand moves too! It moves 30° per hour, so 0.5° per minute.", "Minute hand: 40 × 6° = 240°. Hour hand: 3 × 30° + 40 × 0.5° = 110°. The difference is 240° − 110° = 130°."],
+  ["Number Theory", "What is the smallest positive integer n such that 2n is a perfect square and 3n is a perfect cube?", ["36", "72", "108", "144", "216"], 1,
+   "Write n = 2<sup>a</sup> × 3<sup>b</sup>. What must be true about a and b for each condition?", "For 2n = 2<sup>a+1</sup>3<sup>b</sup> to be a square, a is odd and b is even. For 3n = 2<sup>a</sup>3<sup>b+1</sup> to be a cube, a is a multiple of 3 and b + 1 is a multiple of 3. Smallest: a = 3, b = 2, so n = 8 × 9 = 72. Check: 144 = 12², 216 = 6³."],
+  ["Counting & Probability", "Two fair six-sided dice are rolled. What is the probability that the sum is a <b>prime number</b>?", ["1/6", "1/4", "1/3", "3/8", "5/12"], 4,
+   "List the prime sums from 2 to 12, then count how many of the 36 outcomes give each.", "Prime sums: 2 (1 way), 3 (2), 5 (4), 7 (6), 11 (2). Total 15 ways out of 36 = 5/12."],
+  ["Geometry", `Square ABCD has side length 12. M is the midpoint of BC and N is the midpoint of CD. What is the area of triangle AMN?${SQUARE_FIG}`, ["48", "54", "60", "64", "72"], 1,
+   "Instead of finding the triangle directly, subtract the three corner triangles from the square.", "Square area 144. Subtract triangle ABM (12 × 6 ÷ 2 = 36), triangle ADN (36), and triangle MCN (6 × 6 ÷ 2 = 18). 144 − 36 − 36 − 18 = 54."],
+  ["Counting & Probability", "How many three-digit positive integers have digits whose sum is <b>5</b>?", ["10", "12", "13", "14", "15"], 4,
+   "The hundreds digit can’t be 0. Try counting by the hundreds digit: 1, 2, 3, 4, 5.", "Hundreds digit 1: the other two digits add to 4 (5 ways). 2 → 4 ways, 3 → 3, 4 → 2, 5 → 1. Total 5 + 4 + 3 + 2 + 1 = 15."],
+  ["Word Problems", "A train 300 meters long passes a pole in 15 seconds. At the same speed, how many seconds does it take to completely cross a bridge 450 meters long?", ["25", "30", "32.5", "35", "37.5"], 4,
+   "To fully cross the bridge, the train must travel the bridge length plus its own length.", "Speed = 300 ÷ 15 = 20 m/s. Distance = 450 + 300 = 750 m. Time = 750 ÷ 20 = 37.5 seconds."],
+  ["Word Problems", "A 10-liter solution is 20% salt. How many liters of pure water must be added to make it 8% salt?", ["15", "16", "18", "20", "24"], 0,
+   "The amount of salt doesn’t change when you add water.", "Salt = 20% of 10 = 2 liters. For 2 liters to be 8% of the total, the total is 2 ÷ 0.08 = 25 liters. Add 25 − 10 = 15 liters."],
+  ["Number Theory", "What is the remainder when 2<sup>100</sup> is divided by 7?", ["1", "2", "3", "4", "6"], 1,
+   "Find a small power of 2 that leaves remainder 1 when divided by 7.", "2³ = 8 leaves remainder 1. So 2<sup>99</sup> = (2³)<sup>33</sup> leaves remainder 1, and 2<sup>100</sup> leaves remainder 2."],
+  ["Number Theory", "How many zeros are at the end of 50! (50 factorial)?", ["10", "11", "12", "13", "15"], 2,
+   "Each zero comes from a factor of 10 = 2 × 5. There are plenty of 2s — count the 5s.", "Multiples of 5 up to 50: 10. Multiples of 25 give one extra 5 each: 2. Total 10 + 2 = 12 zeros."],
+  ["Geometry", "A circle is inscribed in a square with side length 10. What is the area of the region inside the square but outside the circle?", ["25π − 50", "50 − 10π", "75 − 20π", "100 − 50π", "100 − 25π"], 4,
+   "The circle touches all four sides. What is its radius?", "The diameter equals the side, 10, so the radius is 5. Area = 10² − π × 5² = 100 − 25π."],
+  ["Algebra", "For which positive integer n does 1 + 2 + 3 + … + n = 666?", ["33", "34", "35", "36", "37"], 3,
+   "The sum 1 + 2 + … + n equals n(n + 1) ÷ 2.", "n(n + 1) ÷ 2 = 666, so n(n + 1) = 1332 = 36 × 37. So n = 36."],
+  ["Counting & Probability", "How many integers from 1 to 100 are divisible by 2 or 3, but <b>not</b> by 5?", ["46", "54", "56", "60", "67"], 1,
+   "First count numbers divisible by 2 or 3 (watch the double count for 6). Then remove the ones also divisible by 5.", "Divisible by 2 or 3: 50 + 33 − 16 = 67. Of those, divisible by 5 means divisible by 10 or 15: 10 + 6 − 3 = 13. Answer: 67 − 13 = 54."],
+  ["Geometry", "How many diagonals does a regular decagon (10 sides) have?", ["35", "40", "45", "50", "70"], 0,
+   "From each vertex, you can draw a diagonal to every vertex except itself and its two neighbors.", "Each of 10 vertices connects to 7 others by diagonals: 10 × 7 = 70. Each diagonal is counted twice, so 70 ÷ 2 = 35."],
+  ["Algebra", "If x + 1/x = 5, what is the value of x² + 1/x²?", ["19", "21", "23", "25", "27"], 2,
+   "Square both sides of x + 1/x = 5 and look at the middle term.", "(x + 1/x)² = x² + 2 + 1/x² = 25, so x² + 1/x² = 23."],
+  ["Geometry", "A 25-foot ladder leans against a wall with its base 7 feet from the wall. The top slides down 4 feet. How many feet does the base slide away from the wall?", ["4", "5", "6", "8", "9"], 3,
+   "Use the Pythagorean theorem twice: before and after sliding.", "Height at first: √(25² − 7²) = 24. New height: 20. New base: √(25² − 20²) = 15. The base moves 15 − 7 = 8 feet."],
+  ["Number Theory", "How many positive divisors does 360 have?", ["24", "28", "30", "32", "36"], 0,
+   "Find the prime factorization, then add 1 to each exponent and multiply.", "360 = 2³ × 3² × 5. Number of divisors = (3 + 1)(2 + 1)(1 + 1) = 24."],
+  ["Algebra", "The product of three consecutive positive integers is 16 times their sum. What is the sum of their squares?", ["77", "110", "149", "194", "245"], 2,
+   "Call the numbers n − 1, n, n + 1. Their sum is 3n.", "(n − 1)n(n + 1) = 16 × 3n, so n² − 1 = 48 and n = 7. The numbers are 6, 7, 8: 36 + 49 + 64 = 149."],
+  ["Counting & Probability", "On a grid, you walk from (0, 0) to (4, 3) taking steps of 1 unit, moving only right or up. How many different paths are there?", ["21", "24", "28", "30", "35"], 4,
+   "Every path has the same number of steps. How many are “up” steps, and where can they go?", "Every path has 7 steps: 4 right and 3 up. Choose which 3 of the 7 steps are up: C(7, 3) = 35."],
+  ["Word Problems", "The pages of a book are numbered 1, 2, 3, …, n. Exactly 192 digits are used. What is n?", ["96", "98", "99", "100", "101"], 3,
+   "Count digits in groups: pages 1–9, then pages 10–99, then three-digit pages.", "Pages 1–9 use 9 digits. Pages 10–99 use 90 × 2 = 180 digits. That’s 189. The remaining 3 digits are one more page: 100. So n = 100."]
+];
+
+window.QUIZ = {
+  key: "amc8-quiz-days-v1",
+  todayId: "amc",
+  title: "Time for the AMC 8 Challenge",
+  lead: "Five tough problems a day. Think it through — hints are here if you need them!",
+  art: ART,
+  letters: ["A", "B", "C", "D", "E"],
+  // 5 problems a day: each day mixes number theory, algebra, geometry, counting, and word problems
+  days: [[1, 2, 3, 5, 12], [4, 6, 7, 9, 13], [8, 17, 10, 11, 25], [14, 20, 16, 18, 21], [15, 23, 19, 24, 22]],
+  qs: RAW.map(([sec, q, c, a, hint, sol]) => ({sec, q, c, a, hint, sol}))
+};
+</script>
+<script src="quiz.js"></script>
+</body>
+</html>
