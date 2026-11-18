@@ -12,6 +12,8 @@ const STUDENT_NAME = "Vincent";
   const PRAISE = ["Correct, {name}!", "Nice work, {name}!", "Exactly right!", "Great thinking, {name}!", "You got it, {name}!"];
   const RETRY = ["Not quite — try again!", "Close! Give it another look.", "Hmm, not this one. You can do it!"];
   const pick = a => a[Math.floor(Math.random() * a.length)];
+  const HUB = STUDENT_NAME ? `${STUDENT_NAME}’s Study Hub` : "My Study Hub";
+  if (STUDENT_NAME) document.title = `${STUDENT_NAME} · ${document.title}`;
 
   const fresh = () => ({days: Q.days.map(() => ({i: 0, res: {}, done: false})), celebrated: false});
   const load = () => { try { const s = JSON.parse(localStorage.getItem(Q.key)); return s && s.days && s.days.length === Q.days.length ? s : null; } catch (e) { return null; } };
@@ -56,7 +58,7 @@ const STUDENT_NAME = "Vincent";
     }).join("");
     main.innerHTML = `
       <a class="link" href="index.html">← All subjects</a>
-      <section class="card hero"><div class="art">${Q.art}</div><h2>${Q.title}</h2><p class="lead">${Q.lead}</p></section>
+      <section class="card hero"><p class="eyebrow">${HUB}</p><div class="art">${Q.art}</div><h2>${STUDENT_NAME ? `${STUDENT_NAME}, it’s ${Q.title.replace(/^Time for /, "time for ")}!` : Q.title}</h2><p class="lead">${Q.lead}</p></section>
       <section class="days" aria-label="Days">${cards}</section>
       ${allDone ? `<div class="btns"><button class="btn soft" id="party">Celebrate again</button></div>` : ""}`;
     main.querySelectorAll(".day").forEach(b => b.addEventListener("click", () => startDay(Number(b.dataset.day))));
@@ -75,7 +77,7 @@ const STUDENT_NAME = "Vincent";
     closePopup(); tries = 0;
     const d = state.days[cur], list = Q.days[cur], n = list[d.i], q = Q.qs[n - 1];
     main.innerHTML = `
-      <div class="qtop"><button class="link" id="back">← Days</button><span class="count">Day ${cur + 1} · ${d.i + 1} / ${list.length}</span></div>
+      <div class="qtop"><button class="link" id="back">← Days</button><span class="count">${STUDENT_NAME ? STUDENT_NAME + " · " : ""}Day ${cur + 1} · ${d.i + 1} / ${list.length}</span></div>
       <div class="bar" aria-hidden="true"><i style="width:${(d.i / list.length) * 100}%"></i></div>
       <section class="card">
         <span class="tag">${q.sec}</span>
@@ -139,7 +141,7 @@ const STUDENT_NAME = "Vincent";
     main.innerHTML = `
       <section class="card center">
         <div class="art">${Q.art}</div>
-        <h2>Day ${k + 1} complete!</h2>
+        <h2>${withName("Day " + (k + 1) + " complete, {name}!")}</h2>
         <div class="big">${s} / ${list.length}</div>
         <p class="lead">${s === list.length ? withName("Perfect score, {name}! Amazing.") : "Correct on the first try. Great effort!"}</p>
         ${missed.length ? `<div class="review"><p class="note">Review these questions:</p>${review}</div>` : ""}
